@@ -31,6 +31,16 @@ app.use(passport.session());
 require('./routes/authRoutes')(app); //require returns a function
 require('./routes/billingRoutes')(app);
 
+//when in production the following code is ran, i.e. if in Heroku
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('client/build'));
+  //catchAll if it is not in the main.js or main.css files below
+  const path = require('path');
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT);
 
