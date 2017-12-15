@@ -11,6 +11,9 @@ import registerServiceWorker from './registerServiceWorker';
 
 import App from './components/App';
 import reducers from './reducers';
+//temp testing code below with axios
+import axios from 'axios';
+window.axios = axios;
 
 const store = createStore(reducers, {}, applyMiddleware(reduxThunk)); //createStore first argument is a reducer, 2nd arg is
 

@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 
 // const passportConfig = require('./services/passport');
 require('./models/User'); //this needs to run before passport because it is not defined in passport
+require('./models/Survey');
 require('./services/passport'); //this needs to have the models defined so it comes after the models
 
 // const authRoutes = require('./routes/authRoutes'); //instead of using this we straight up use the
@@ -28,8 +29,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+//Route handlers
 require('./routes/authRoutes')(app); //require returns a function
 require('./routes/billingRoutes')(app);
+require('./routes/surveyRoutes')(app);
 
 //when in production the following code is ran, i.e. if in Heroku
 if (process.env.NODE_ENV === 'production') {
@@ -48,4 +51,3 @@ app.listen(PORT);
 // app.get('/', (req, res) => {
 //   res.send({ hi: 'there, Gerson' });
 // });
-
