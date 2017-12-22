@@ -5,17 +5,11 @@ import { reduxForm, Field } from 'redux-form'; //this connects the form with red
 import SurveyField from './SurveyField';
 import validateEmails from '../../utils/validateEmails';
 import { Link } from 'react-router-dom';
-
-const FIELDS = [
-  { label: 'Survey Title', name: 'title' },
-  { label: 'Subject Line', name: 'subject' },
-  { label: 'E-mail Body', name: 'body' },
-  { label: 'Recipient List', name: 'emails' }
-];
+import formFields from './formFields';
 
 class SurveyForm extends React.Component {
   renderFields() {
-    return _.map(FIELDS, ({ label, name }) => {
+    return _.map(formFields, ({ label, name }) => {
       return (
         <Field
           key={name}
@@ -33,7 +27,7 @@ class SurveyForm extends React.Component {
       <div>
         <form
           onSubmit={this.props.handleSubmit(
-            values => console.log(values) //this is how we can put the values into some backend server
+            this.props.onSurveySubmit //this is how we can put the values into some backend server
           )}
         >
           {this.renderFields()}
@@ -53,8 +47,8 @@ class SurveyForm extends React.Component {
 //redux form automatically matches up the errors with the fields you are rendering
 function validate(values) {
   const errors = {};
-  errors.emails = validateEmails(values.emails || '');
-  _.each(FIELDS, ({ name }) => {
+  errors.recipients = validateEmails(values.recipients || '');
+  _.each(formFields, ({ name }) => {
     if (!values[name]) {
       errors[name] = 'You must provide a value.';
     }
@@ -73,9 +67,11 @@ function validate(values) {
 //   errors.body = 'You must provide a body';
 // }
 
+//Redux Form Helper
 export default reduxForm({
   validate, //this => validate: validate is es 5,
-  form: 'surveyForm'
+  form: 'surveyForm',
+  destroyOnUnmount: false //doesn't get rid of form data upon Unmounting
 })(SurveyForm);
 
 //Below was what was in the reenderfields array
