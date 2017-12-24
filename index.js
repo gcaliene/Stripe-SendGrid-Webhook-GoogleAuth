@@ -5,14 +5,11 @@ const cookieSession = require('cookie-session');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 
-// const passportConfig = require('./services/passport');
-require('./models/User'); //this needs to run before passport because it is not defined in passport
+require('./models/User');
 require('./models/Survey');
-require('./services/passport'); //this needs to have the models defined so it comes after the models
+require('./services/passport');
 
-// const authRoutes = require('./routes/authRoutes'); //instead of using this we straight up use the
-
-// mongoose.connect(keys.mongoURI); //gives deprecation warning
+mongoose.Promise = global.Promise;
 mongoose.connection.openUri(keys.mongoURI);
 
 const app = express();
