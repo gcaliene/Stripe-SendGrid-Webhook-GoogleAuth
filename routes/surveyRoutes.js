@@ -15,22 +15,36 @@ module.exports = app => {
   });
 
   app.post('/api/surveys/webhooks', (req, res) => {
-    const events = _.map(req.body, e => {
-      // const pathname = ;
-      const p = new Path('/api/surveys/:surveyId/:choice');
-      const match = p.test(new URL(e.url).pathname);
-      if (match) {
-        return {
-          email: e.email,
-          surveyId: match.surveyId,
-          choice: match.choice
-        };
-      }
-    });
-    const compactEvents = _.compact(events);
-    const uniqueEvents = _.uniqBy(compactEvents, 'email', 'surveyId');
+    _.chain(req.body)
+      .map(({ email, url }) => {
+        const p = new Path('/api/surveys/:surveyId/:choice');
+        const match = p.test(new URL(url).pathname);
+        if (match) {
+          return {
+            email,
+            surveyId: match.surveyId,
+            choice: match.choice
+          };
+        }
+      })
+      .compact()
+      .uniqBy('email', 'surveyId')
+      .each(({ surveyId, email, choice }) => {
+        Survey.updateOne(
+          {
+            _id: surveyId, //in mongo it is an _id but mongoose respects the 'id' naming convention. but be safe with _id
+            recipients: {
+              $elemMatch: { email: email, responded: false }
+            }
+          },
+          {
+            $inc: { [choice]: 1 },
+            $set: { 'recipients.$.responded': true }
+          }
+        ).exec();
+      })
+      .value();
 
-    console.log(uniqueEvents);
     res.send({});
   });
   app.post('/api/surveys', requireLogin, requireCredits, async (req, res) => {
