@@ -1,5 +1,6 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const CoinbaseStrategy = require('passport-coinbase').Strategy;
 const mongoose = require('mongoose');
 const keys = require('../config/keys');
 
@@ -36,3 +37,13 @@ passport.use(
     }
   )
 );
+
+passport.use(new CoinbaseStrategy({
+  clientID: process.env.COINBASE_CLIENT_ID,
+  clientSecret: process.env.COINBASE_CLIENT_SECRET,
+  callbackURL: "http://127.0.0.1:3000/auth/coinbase/callback"
+},
+function(accessToken, refreshToken, profile, done) {
+  // ...
+}
+));
